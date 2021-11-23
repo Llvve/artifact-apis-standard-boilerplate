@@ -12,83 +12,83 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { FooDTO } from './dto/foo.dto';
-import { FooService } from './foo.service';
+import { BarDTO } from './dto/bar.dto';
+import { BarService } from './bar.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { RequestDTO } from 'src/common/dto/request.dto';
-import { FooSearchDTO } from './dto/foo-search.dto';
+import { BarSearchDTO } from './dto/bar-search.dto';
 
-@Controller('/v1/foo')
-export class FooController {
-  constructor(private readonly fooService: FooService) {}
+@Controller('/v1/bar')
+export class BarController {
+  constructor(private readonly barService: BarService) {}
 
   @Get('/search')
   @UsePipes(new ValidationPipe({ transform: true }))
-  searchFoo(@Query() fooSearchDTO: FooSearchDTO): Promise<ResponseDTO<any[]>> {
-    return this.fooService
-      .search(fooSearchDTO)
+  searchBar(@Query() barSearchDTO: BarSearchDTO): Promise<ResponseDTO<any[]>> {
+    return this.barService
+      .search(barSearchDTO)
       .then((result) => {
         return result;
       })
       .catch((err) => {
-        Logger.error(err, err.stack, FooService.name);
+        Logger.error(err, err.stack, BarService.name);
         throw new BadRequestException(err.message);
       });
   }
 
   @Get('/get/:id')
-  getFoo(@Param('id') id: string): Promise<ResponseDTO<FooDTO>> {
-    return this.fooService
+  getBar(@Param('id') id: string): Promise<ResponseDTO<BarDTO>> {
+    return this.barService
       .read(id)
       .then((result) => {
-        const response = new ResponseDTO<FooDTO>();
+        const response = new ResponseDTO<BarDTO>();
         response.data = result;
 
         return response;
       })
       .catch((err) => {
-        Logger.error(err, err.stack, FooService.name);
+        Logger.error(err, err.stack, BarService.name);
         throw new BadRequestException(err.message);
       });
   }
 
   @Post('/create')
-  createFoo(@Body() FooDTO: RequestDTO<FooDTO>): Promise<ResponseDTO<FooDTO>> {
-    return this.fooService
-      .create(FooDTO.data)
+  createBar(@Body() barDTO: RequestDTO<BarDTO>): Promise<ResponseDTO<BarDTO>> {
+    return this.barService
+      .create(barDTO.data)
       .then((result) => {
-        const response = new ResponseDTO<FooDTO>();
+        const response = new ResponseDTO<BarDTO>();
         response.data = result;
 
         return response;
       })
       .catch((err) => {
-        Logger.error(err, err.stack, FooService.name);
+        Logger.error(err, err.stack, BarService.name);
         throw new BadRequestException(err.message);
       });
   }
 
   @Put('/update')
-  updateFoo(
-    @Body() FooUpdateDTO: RequestDTO<FooDTO>,
-  ): Promise<ResponseDTO<FooDTO>> {
-    return this.fooService
-      .update(FooUpdateDTO.data)
+  updateBar(
+    @Body() barUpdateDTO: RequestDTO<BarDTO>,
+  ): Promise<ResponseDTO<BarDTO>> {
+    return this.barService
+      .update(barUpdateDTO.data)
       .then((result) => {
-        const response = new ResponseDTO<FooDTO>();
+        const response = new ResponseDTO<BarDTO>();
         response.data = result;
 
         return response;
       })
       .catch((err) => {
-        Logger.error(err, err.stack, FooService.name);
+        Logger.error(err, err.stack, BarService.name);
         throw new BadRequestException(err.message);
       });
   }
 
   @Delete('/delete/:id')
-  deleteFoo(@Param('id') id: string): Promise<ResponseDTO<any>> {
-    return this.fooService
+  deleteBar(@Param('id') id: string): Promise<ResponseDTO<any>> {
+    return this.barService
       .delete(id)
       .then((result) => {
         const response = new ResponseDTO<any>();
@@ -97,7 +97,7 @@ export class FooController {
         return response;
       })
       .catch((err) => {
-        Logger.error(err, err.stack, FooService.name);
+        Logger.error(err, err.stack, BarService.name);
         throw new BadRequestException(err.message);
       });
   }

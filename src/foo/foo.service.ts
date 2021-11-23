@@ -20,7 +20,7 @@ export class FooService implements ICRUDService<FooDTO, void> {
     return new FooDTO(foo);
   }
 
-  async searchFoo(fooSearchDTO: FooSearchDTO): Promise<ResponseDTO<FooDTO[]>> {
+  async search(fooSearchDTO: FooSearchDTO): Promise<ResponseDTO<FooDTO[]>> {
     this.fooRepository.page(fooSearchDTO.page, fooSearchDTO.limit);
 
     if (fooSearchDTO.query) {
