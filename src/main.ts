@@ -25,7 +25,7 @@ async function bootstrap() {
   app.enableCors();
 
   const port = parseInt(process.env.PORT, 10) || 4002;
-  await app.startAllMicroservicesAsync();
+  await app.startAllMicroservices();
   await app.listen(port);
 }
 bootstrap();
