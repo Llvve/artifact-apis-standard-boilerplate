@@ -4,12 +4,8 @@ import { AppHealthIndicator } from './app.health';
 import { HealthController } from './health.controller';
 
 @Module({
-  imports: [
-    TerminusModule,
-  ],
-  controllers: [
-    HealthController,
-  ],
+  imports: [TerminusModule],
+  controllers: [HealthController],
   providers: [AppHealthIndicator],
 })
 export class HealthModule {}

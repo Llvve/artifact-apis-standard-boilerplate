@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
+import {
+  HealthIndicator,
+  HealthIndicatorResult,
+  HealthCheckError,
+} from '@nestjs/terminus';
 
 @Injectable()
 export class AppHealthIndicator extends HealthIndicator {
@@ -12,9 +16,11 @@ export class AppHealthIndicator extends HealthIndicator {
     let error: string = '';
 
     //TODO check healthy
-    isHealthy = true
-    
-    const result: HealthIndicatorResult = this.getStatus(key, isHealthy, { error });
+    isHealthy = true;
+
+    const result: HealthIndicatorResult = this.getStatus(key, isHealthy, {
+      error,
+    });
 
     if (isHealthy) {
       return result;
