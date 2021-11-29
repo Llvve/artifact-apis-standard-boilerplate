@@ -3,7 +3,6 @@ import { Expose, Exclude } from 'class-transformer';
 
 @Exclude()
 export class RootPathResDto {
-
   constructor(appName: string) {
     this.appName = appName;
   }

@@ -12,8 +12,8 @@ export class AppHealthIndicator extends HealthIndicator {
   }
 
   public async isHealthy(key: string): Promise<HealthIndicatorResult> {
-    let isHealthy: boolean = false;
-    let error: string = '';
+    let isHealthy = false;
+    const error = '';
 
     //TODO check healthy
     isHealthy = true;
