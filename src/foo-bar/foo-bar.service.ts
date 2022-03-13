@@ -132,7 +132,7 @@ export class FooBarService {
         .getFooBarRelationRepository()
         .where({ fooId: fooId })
         .delete(),
-      deleteScopeMasterCount: await this.fooBarRepository
+      deleteBarCount: await this.fooBarRepository
         .getBarRepository()
         .where({ id: barId })
         .delete(),
