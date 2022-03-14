@@ -40,7 +40,7 @@ export abstract class BaseRepository implements OnModuleInit {
 
   findAndCountAll(
     attributes?: any,
-  ): Promise<{ rows: Model<any, any>[]; count: number }> {
+  ): Promise<{ rows: Model<any, any>[]; count: number[] }> {
     attributes = this.constructAttrOptions(attributes);
 
     const promise = this.model.findAndCountAll(attributes);
@@ -83,7 +83,7 @@ export abstract class BaseRepository implements OnModuleInit {
     return promise;
   }
 
-  bulkInsert(data: any[], fields?: any): Promise<Model[]> {
+  bulkInsert(data: any[], fields?: any): Promise<Array<Model>> {
     return this.model.bulkCreate(data, fields);
   }
 
@@ -160,6 +160,19 @@ export abstract class BaseRepository implements OnModuleInit {
     return this;
   }
 
+  and(dto: Array<any>): BaseRepository {
+    if (!dto) {
+      return this;
+    }
+    if (!this.includeOptions['where']) {
+      this.includeOptions['where'] = {};
+    }
+
+    this.includeOptions['where'][Op.and] = dto;
+
+    return this;
+  }
+
   order(field: string, type: string, model?: ModelCtor<Model>): BaseRepository {
     if (model) {
       this.includeOptions['order'] = [[model, field, type]];
@@ -212,15 +225,31 @@ export abstract class BaseRepository implements OnModuleInit {
         const condition = option['filter']['condition']
           ? option['filter']['condition']
           : 'AND';
-        const filterKeys = Object.keys(option['filter']);
+        delete option['filter']['condition'];
 
+        const filterKeys = Object.keys(option['filter']);
         for (let i = 0; i < filterKeys.length; i++) {
           const filterKey = filterKeys[i];
           let suffixConditionQuery = '';
           if (i < filterKeys.length - 1) {
             suffixConditionQuery = ` ${condition} `;
           }
-          conditionQuery += `${filterKey} = '${option['filter'][filterKey]}'${suffixConditionQuery}`;
+
+          if (Array.isArray(option['filter'][filterKey])) {
+            const fieldFilters = option['filter'][filterKey];
+            for (let j = 0; j < fieldFilters.length; j++) {
+              let suffixFieldFiltersConditionQuery = '';
+              if (j < fieldFilters.length - 1) {
+                suffixFieldFiltersConditionQuery = ` ${condition}`;
+              }
+              conditionQuery += `${filterKey} = '${fieldFilters[j]}'${suffixFieldFiltersConditionQuery} `;
+            }
+          } else if (typeof option['filter'][filterKey] === 'object') {
+            conditionQuery += `${filterKey} ${option['filter'][filterKey]['command']} 
+            '${option['filter'][filterKey]['data']}'${suffixConditionQuery}`;
+          } else {
+            conditionQuery += `${filterKey} = '${option['filter'][filterKey]}'${suffixConditionQuery}`;
+          }
         }
       } else {
         const filterKey = Object.keys(option['filter'])[0];
@@ -231,7 +260,7 @@ export abstract class BaseRepository implements OnModuleInit {
       if (option['cast']) {
         sumQuery = `CAST(SUM(${field}) FILTER (WHERE ${conditionQuery}) AS ${option['cast']})`;
       } else {
-        sumQuery = `SUM(${field}) FILTER (WHERE status = ${conditionQuery}))`;
+        sumQuery = `SUM(${field}) FILTER (WHERE ${conditionQuery})`;
       }
 
       if (option.hasOwnProperty('coalesce')) {
@@ -240,22 +269,13 @@ export abstract class BaseRepository implements OnModuleInit {
 
       attributes.push([Sequelize.literal(sumQuery), display]);
     } else {
-      let sumFn = Sequelize.fn('sum', Sequelize.col(field));
-      if (option.hasOwnProperty('coalesce')) {
-        sumFn = Sequelize.fn(
-          'sum',
-          Sequelize.fn('COALESCE', Sequelize.col(field), option['coalesce']),
-        );
-      }
-
       if (option['json']) {
         if (option['cast']) {
-          attributes.push([
-            Sequelize.literal(
-              `CAST(sum((${field})::numeric) AS ${option['cast']})`,
-            ),
-            display,
-          ]);
+          let sumQuery = `CAST(sum((${field})::numeric) AS ${option['cast']})`;
+          if (option.hasOwnProperty('coalesce')) {
+            sumQuery = `COALESCE(${sumQuery}, ${option['coalesce']})`;
+          }
+          attributes.push([Sequelize.literal(sumQuery), display]);
         } else {
           attributes.push([
             Sequelize.literal(`sum((${field})::numeric)`),
@@ -264,6 +284,17 @@ export abstract class BaseRepository implements OnModuleInit {
         }
       } else {
         if (option['cast']) {
+          let sumFn = Sequelize.fn('sum', Sequelize.col(field));
+          if (option.hasOwnProperty('coalesce')) {
+            sumFn = Sequelize.fn(
+              'sum',
+              Sequelize.fn(
+                'COALESCE',
+                Sequelize.col(field),
+                option['coalesce'],
+              ),
+            );
+          }
           attributes.push([Sequelize.cast(sumFn, option['cast']), display]);
         } else {
           attributes.push([Sequelize.fn('sum', Sequelize.col(field)), display]);
