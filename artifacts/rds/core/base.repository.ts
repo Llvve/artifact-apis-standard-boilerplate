@@ -40,7 +40,7 @@ export abstract class BaseRepository implements OnModuleInit {
 
   findAndCountAll(
     attributes?: any,
-  ): Promise<{ rows: Model<any, any>[]; count: number[] }> {
+  ): Promise<{ rows: Model<any, any>[]; count: number }> {
     attributes = this.constructAttrOptions(attributes);
 
     const promise = this.model.findAndCountAll(attributes);
