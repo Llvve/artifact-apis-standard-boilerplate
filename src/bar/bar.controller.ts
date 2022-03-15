@@ -24,7 +24,9 @@ export class BarController {
 
   @Get('/search')
   @UsePipes(new ValidationPipe({ transform: true }))
-  searchBar(@Query() barSearchDTO: BarSearchDTO): Promise<ResponseDTO<any[]>> {
+  searchBar(
+    @Query() barSearchDTO: BarSearchDTO,
+  ): Promise<ResponseDTO<BarDTO[]>> {
     return this.barService
       .search(barSearchDTO)
       .then((result) => {

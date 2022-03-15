@@ -24,7 +24,9 @@ export class FooController {
 
   @Get('/search')
   @UsePipes(new ValidationPipe({ transform: true }))
-  searchFoo(@Query() fooSearchDTO: FooSearchDTO): Promise<ResponseDTO<any[]>> {
+  searchFoo(
+    @Query() fooSearchDTO: FooSearchDTO,
+  ): Promise<ResponseDTO<FooDTO[]>> {
     return this.fooService
       .search(fooSearchDTO)
       .then((result) => {
