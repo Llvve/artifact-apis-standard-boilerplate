@@ -11,7 +11,7 @@ import { FooBarRelationDTO } from './dto/foo-bar-relation.dto';
 export class FooBarService {
   constructor(private readonly fooBarRepository: FooBarRepository) {}
 
-  async create(view: string, fooBarDTO: FooBarDTO): Promise<FooBarDTO> {
+  async create(view: string, fooBarDTO: any): Promise<FooBarDTO> {
     const fooBar = await this.fooBarRepository.include(view).insert(fooBarDTO);
 
     return new FooBarDTO(fooBar);
